@@ -4,20 +4,32 @@ import {
   Box,
   Button,
   Typography,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
   Container,
   LinearProgress,
+  Grid,
+  Stack,
 } from "@mui/material";
 import { fetchQuestions } from "../api";
 import he from "he";
 import { GameState, QuestionResponse } from "../types";
+import { styled } from "@mui/material/styles";
 
 interface QuestionScreenProps {
   gameState: GameState;
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
 }
+
+const OptionButton = styled(Button)<{ selected: boolean }>(({ selected }) => ({
+  width: "100%",
+  height: "100px",
+  backgroundColor: "#B6B6B6",
+  color: "#000",
+  fontSize: "20px",
+  textTransform: "none",
+  textAlign: "center",
+  whiteSpace: "normal",
+  border: selected ? "2px solid #1976d2" : "1px solid black",
+}));
 
 const QuestionScreen: React.FC<QuestionScreenProps> = ({
   gameState,
@@ -26,6 +38,7 @@ const QuestionScreen: React.FC<QuestionScreenProps> = ({
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState("");
   const [timer, setTimer] = useState(90);
+  const [shuffledAnswers, setShuffledAnswers] = useState<string[]>([]);
   const N = 3; // Number of questions per category
   const M = 3; // Number of categories to complete
 
@@ -40,7 +53,6 @@ const QuestionScreen: React.FC<QuestionScreenProps> = ({
     category: gameState.currentCategory,
     difficulty: gameState.difficulty,
     token: gameState.token,
-    type: "multiple",
   };
 
   const { data: questions, isLoading } = useQuery<QuestionResponse[]>({
@@ -61,6 +73,23 @@ const QuestionScreen: React.FC<QuestionScreenProps> = ({
     }, 1000);
     return () => clearInterval(countdown);
   }, [currentQuestionIndex]);
+
+  useEffect(() => {
+    if (questions && questions[currentQuestionIndex]) {
+      const currentQuestion = questions[currentQuestionIndex];
+      if (currentQuestion.type === "multiple") {
+        const answers = [
+          currentQuestion.correct_answer,
+          ...currentQuestion.incorrect_answers,
+        ];
+
+        const shuffled = [...answers].sort(() => Math.random() - 0.5);
+        setShuffledAnswers(shuffled);
+      } else {
+        setShuffledAnswers(["True", "False"]);
+      }
+    }
+  }, [currentQuestionIndex, questions]);
 
   const handleSubmit = () => {
     if (!questions) return;
@@ -122,58 +151,106 @@ const QuestionScreen: React.FC<QuestionScreenProps> = ({
 
   if (isLoading)
     return (
-      <Container maxWidth="sm" sx={{ mt: 5, textAlign: "center" }}>
+      <Container
+        maxWidth="sm"
+        sx={{
+          mt: 5,
+          textAlign: "center",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+        }}
+      >
         <LinearProgress />
       </Container>
     );
 
   if (!questions || questions.length === 0)
     return (
-      <Container maxWidth="sm" sx={{ mt: 5, textAlign: "center" }}>
+      <Container
+        maxWidth="sm"
+        sx={{
+          mt: 5,
+          textAlign: "center",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+        }}
+      >
         <Typography variant="h6">No questions available.</Typography>
       </Container>
     );
 
   const currentQuestion = questions[currentQuestionIndex];
-  const answers = [
-    currentQuestion.correct_answer,
-    ...currentQuestion.incorrect_answers,
-  ].sort(() => Math.random() - 0.5);
 
   return (
-    <Container maxWidth="md" sx={{ mt: 5 }}>
-      <Typography variant="h6">Time Left: {timer} seconds</Typography>
-      <Box sx={{ my: 2 }}>
-        <Typography variant="h5">
+    <Container
+      maxWidth="md"
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        height: "100vh",
+      }}
+    >
+      <Box sx={{ textAlign: "center" }}>
+        <Typography variant="h6" sx={{ fontSize: "30px", mb: 2 }}>
+          Time Left: {timer} seconds
+        </Typography>
+        <Typography variant="h4" sx={{ fontSize: "40px", mb: 3 }}>
           {he.decode(currentQuestion.question)}
         </Typography>
-      </Box>
-      <RadioGroup
-        value={selectedAnswer}
-        onChange={(e) => setSelectedAnswer(e.target.value)}
-      >
-        {answers.map((answer, index) => (
-          <FormControlLabel
-            key={index}
-            value={answer}
-            control={<Radio />}
-            label={he.decode(answer)}
-          />
-        ))}
-      </RadioGroup>
-      <Box sx={{ mt: 3 }}>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleSubmit}
-          disabled={!selectedAnswer}
-          sx={{ mr: 2 }}
+
+        <Grid
+          container
+          spacing={2}
+          justifyContent="center"
+          alignItems="center"
+          sx={{
+            rowGap: "60px",
+            columnGap: "25px",
+            maxWidth: "700px",
+            margin: "0 auto",
+          }}
         >
-          Submit Answer
-        </Button>
-        <Button variant="outlined" onClick={handleSkip}>
-          Skip Question
-        </Button>
+          {shuffledAnswers.map((answer, index) => (
+            <Grid item xs={6} key={index} maxWidth="47% !important">
+              <OptionButton
+                onClick={() => setSelectedAnswer(answer)}
+                selected={selectedAnswer === answer}
+              >
+                {he.decode(answer)}
+              </OptionButton>
+            </Grid>
+          ))}
+        </Grid>
+
+        <Stack
+          flexDirection="row"
+          alignItems="center"
+          justifyContent="center"
+          gap={4}
+          sx={{ mt: 4 }}
+        >
+          <Button
+            variant="outlined"
+            onClick={handleSkip}
+            sx={{ width: "150px", height: "50px", fontSize: "20px" }}
+          >
+            Skip
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSubmit}
+            disabled={!selectedAnswer}
+            sx={{ width: "150px", height: "50px", fontSize: "20px" }}
+          >
+            Next
+          </Button>
+        </Stack>
       </Box>
     </Container>
   );
