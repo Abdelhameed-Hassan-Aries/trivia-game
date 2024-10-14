@@ -18,8 +18,9 @@ interface CategorySelectionProps {
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
 }
 
+// Styled Components
 const CategoryButton = styled(Button)<{ selected: boolean }>(
-  ({ selected }) => ({
+  ({ selected, theme }) => ({
     width: "100%",
     height: "100px",
     backgroundColor: "#B6B6B6",
@@ -30,6 +31,10 @@ const CategoryButton = styled(Button)<{ selected: boolean }>(
     textWrap: "balance",
     "&:disabled": {
       opacity: 0.5,
+    },
+    [theme.breakpoints.down("sm")]: {
+      height: "80px",
+      fontSize: "16px",
     },
   })
 );
@@ -51,16 +56,24 @@ const StartButton = styled(Button)(({ theme }) => ({
   "&:disabled": {
     opacity: 0.5,
   },
+  [theme.breakpoints.down("sm")]: {
+    width: "160px",
+    height: "40px",
+    marginTop: "30px",
+    marginBottom: "30px",
+    fontSize: "20px",
+  },
 }));
 
 const InstructionBox = styled(Box)(({ theme }) => ({
-  position: "absolute",
-  bottom: "20px",
-  left: "20px",
   display: "flex",
   alignItems: "center",
   gap: "10px",
   color: "#000",
+  [theme.breakpoints.down("sm")]: {
+    gap: "5px",
+    fontSize: "0.8rem",
+  },
 }));
 
 const ShortcutKey = styled(Box)(({ theme }) => ({
@@ -69,6 +82,10 @@ const ShortcutKey = styled(Box)(({ theme }) => ({
   borderRadius: "4px",
   fontWeight: "bold",
   marginRight: "5px",
+  [theme.breakpoints.down("sm")]: {
+    padding: "1px 4px",
+    fontSize: "0.8rem",
+  },
 }));
 
 const CategorySelection: React.FC<CategorySelectionProps> = ({
@@ -114,7 +131,6 @@ const CategorySelection: React.FC<CategorySelectionProps> = ({
         availableCategories[
           Math.floor(Math.random() * availableCategories.length)
         ];
-
       categoryId = randomCategory.id;
     }
 
@@ -167,28 +183,41 @@ const CategorySelection: React.FC<CategorySelectionProps> = ({
 
   return (
     <Container
+      maxWidth="lg" // Use responsive maxWidth
       sx={{
-        minWidth: "100%",
-        width: "100%",
         minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         pt: 5,
         color: "#000",
-        margin: "16px",
+        paddingX: 2, // Replace margin with padding
         position: "relative",
+        overflowX: "hidden", // Prevent horizontal overflow
       }}
       tabIndex={0}
       onKeyDown={handleKeyDown}
     >
-      <Typography variant="h2" gutterBottom sx={{ marginBottom: "60px" }}>
+      <Typography
+        variant="h2"
+        gutterBottom
+        sx={{ marginBottom: "60px", textAlign: "center" }}
+      >
         Questions Category
       </Typography>
-      <Box sx={{ width: "100%", maxWidth: 1000 }}>
-        <Grid container spacing={5} justifyContent="center">
+      <Box
+        sx={{
+          width: "100%",
+          maxWidth: {
+            xs: "100%", // Full width on extra-small screens
+            sm: "100%", // Full width on small screens
+            md: "1000px", // 1000px max width on medium and larger screens
+          },
+        }}
+      >
+        <Grid container spacing={2} justifyContent="center">
           {categories?.map((category, index) => (
-            <Grid item xs={12} sm={4} md={4} key={category.id}>
+            <Grid item xs={12} sm={6} md={4} key={category.id}>
               <CategoryButton
                 onClick={() => handleSelectCategory(category.id)}
                 disabled={gameState.selectedCategories.includes(category.id)}
@@ -199,7 +228,7 @@ const CategorySelection: React.FC<CategorySelectionProps> = ({
               </CategoryButton>
             </Grid>
           ))}
-          <Grid item xs={12}>
+          <Grid item xs={12} sm={6} md={4}>
             <CategoryButton
               onClick={() => handleSelectCategory("random")}
               selected={selectedCategory === "random"}
@@ -218,10 +247,30 @@ const CategorySelection: React.FC<CategorySelectionProps> = ({
         START
       </StartButton>
 
-      <InstructionBox>
+      {/* InstructionBox positioned fixed to avoid affecting layout */}
+      <InstructionBox
+        sx={{
+          position: "fixed",
+          bottom: {
+            xs: "10px", // 10px from bottom on extra-small screens
+            sm: "20px", // 20px on small and larger screens
+          },
+          left: {
+            xs: "10px", // 10px from left on extra-small screens
+            sm: "20px", // 20px on small and larger screens
+          },
+        }}
+      >
         <KeyboardIcon />
         <Typography variant="body1">Move Around</Typography>
-        <Box sx={{ display: "flex", alignItems: "center", ml: 2, gap: "10px" }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            ml: 2,
+            gap: "5px",
+          }}
+        >
           <ShortcutKey>Space</ShortcutKey>
           <Typography variant="body1">Select</Typography>
           <ShortcutKey>S</ShortcutKey>
