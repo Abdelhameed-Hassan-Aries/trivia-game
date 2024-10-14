@@ -18,7 +18,6 @@ interface CategorySelectionProps {
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
 }
 
-// Styled Components
 const CategoryButton = styled(Button)<{ selected: boolean }>(
   ({ selected, theme }) => ({
     width: "100%",
@@ -183,7 +182,7 @@ const CategorySelection: React.FC<CategorySelectionProps> = ({
 
   return (
     <Container
-      maxWidth="lg" // Use responsive maxWidth
+      maxWidth="lg"
       sx={{
         minHeight: "100vh",
         display: "flex",
@@ -191,9 +190,9 @@ const CategorySelection: React.FC<CategorySelectionProps> = ({
         alignItems: "center",
         pt: 5,
         color: "#000",
-        paddingX: 2, // Replace margin with padding
+        paddingX: 2,
         position: "relative",
-        overflowX: "hidden", // Prevent horizontal overflow
+        overflowX: "hidden",
       }}
       tabIndex={0}
       onKeyDown={handleKeyDown}
@@ -209,9 +208,9 @@ const CategorySelection: React.FC<CategorySelectionProps> = ({
         sx={{
           width: "100%",
           maxWidth: {
-            xs: "100%", // Full width on extra-small screens
-            sm: "100%", // Full width on small screens
-            md: "1000px", // 1000px max width on medium and larger screens
+            xs: "100%",
+            sm: "100%",
+            md: "1000px",
           },
         }}
       >
@@ -247,17 +246,16 @@ const CategorySelection: React.FC<CategorySelectionProps> = ({
         START
       </StartButton>
 
-      {/* InstructionBox positioned fixed to avoid affecting layout */}
       <InstructionBox
         sx={{
           position: "fixed",
           bottom: {
-            xs: "10px", // 10px from bottom on extra-small screens
-            sm: "20px", // 20px on small and larger screens
+            xs: "10px",
+            sm: "20px",
           },
           left: {
-            xs: "10px", // 10px from left on extra-small screens
-            sm: "20px", // 20px on small and larger screens
+            xs: "10px",
+            sm: "20px",
           },
         }}
       >

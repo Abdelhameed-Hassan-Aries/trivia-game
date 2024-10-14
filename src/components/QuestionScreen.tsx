@@ -13,23 +13,32 @@ import { fetchQuestions } from "../api";
 import he from "he";
 import { GameState, QuestionResponse } from "../types";
 import { styled } from "@mui/material/styles";
+import KeyboardIcon from "@mui/icons-material/Keyboard";
 
 interface QuestionScreenProps {
   gameState: GameState;
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
 }
 
-const OptionButton = styled(Button)<{ selected: boolean }>(({ selected }) => ({
-  width: "100%",
-  minHeight: "100px",
-  backgroundColor: "#B6B6B6",
-  color: "#000",
-  fontSize: "20px",
-  textTransform: "none",
-  textAlign: "center",
-  whiteSpace: "normal",
-  border: selected ? "2px solid #1976d2" : "1px solid black",
-}));
+const OptionButton = styled(Button)<{ selected: boolean }>(
+  ({ selected, theme }) => ({
+    width: "100%",
+    minHeight: "100px",
+    backgroundColor: "#B6B6B6",
+    color: "#000",
+    fontSize: "20px",
+    textTransform: "none",
+    textAlign: "center",
+    whiteSpace: "normal",
+    border: selected ? "2px solid #1976d2" : "1px solid black",
+    [theme.breakpoints.down("sm")]: {
+      minHeight: "80px",
+      fontSize: "16px",
+      width: "fit-content",
+      paddingX: 2,
+    },
+  })
+);
 
 const ActionButton = styled(Button)(({ theme }) => ({
   width: "150px",
@@ -41,16 +50,26 @@ const ActionButton = styled(Button)(({ theme }) => ({
   "&:hover": {
     backgroundColor: "#B6B6B6",
   },
+  [theme.breakpoints.down("sm")]: {
+    width: "130px",
+    height: "45px",
+    fontSize: "18px",
+  },
 }));
 
 const InstructionBox = styled(Box)(({ theme }) => ({
-  position: "absolute",
-  bottom: "20px",
-  left: "20px",
   display: "flex",
   alignItems: "center",
   gap: "10px",
   color: "#000",
+  [theme.breakpoints.down("xs")]: {
+    flexDirection: "column",
+    alignItems: "flex-start",
+    gap: "5px",
+  },
+  [theme.breakpoints.up("sm")]: {
+    flexDirection: "row",
+  },
 }));
 
 const ShortcutKey = styled(Box)(({ theme }) => ({
@@ -59,6 +78,11 @@ const ShortcutKey = styled(Box)(({ theme }) => ({
   borderRadius: "4px",
   fontWeight: "bold",
   marginRight: "5px",
+  [theme.breakpoints.down("xs")]: {
+    marginRight: "0px",
+    marginBottom: "5px",
+    fontSize: "0.8rem",
+  },
 }));
 
 const QuestionScreen: React.FC<QuestionScreenProps> = ({
@@ -107,7 +131,7 @@ const QuestionScreen: React.FC<QuestionScreenProps> = ({
       });
     }, 1000);
     return () => clearInterval(countdown);
-  }, [currentQuestionIndex]);
+  }, [currentQuestionIndex, gameState.difficulty]);
 
   useEffect(() => {
     if (questions && questions[currentQuestionIndex]) {
@@ -227,9 +251,12 @@ const QuestionScreen: React.FC<QuestionScreenProps> = ({
           alignItems: "center",
           justifyContent: "center",
           height: "100vh",
+          paddingX: 2,
         }}
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
       >
-        <LinearProgress />
+        <LinearProgress sx={{ width: "100%" }} />
       </Container>
     );
 
@@ -244,7 +271,10 @@ const QuestionScreen: React.FC<QuestionScreenProps> = ({
           alignItems: "center",
           justifyContent: "center",
           height: "100vh",
+          paddingX: 2,
         }}
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
       >
         <Typography variant="h6">No questions available.</Typography>
       </Container>
@@ -256,20 +286,38 @@ const QuestionScreen: React.FC<QuestionScreenProps> = ({
     <Container
       maxWidth="md"
       sx={{
+        minHeight: "100vh",
         display: "flex",
+        flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        height: "100vh",
+        pt: 5,
+        pb: { xs: "50px", sm: 5 },
+        color: "#000",
+        paddingX: 2,
         position: "relative",
+        overflowX: "hidden",
       }}
       tabIndex={0}
       onKeyDown={handleKeyDown}
     >
-      <Box sx={{ textAlign: "center" }}>
-        <Typography variant="h6" sx={{ fontSize: "30px", mb: 2 }}>
+      <Box sx={{ textAlign: "center", width: "100%", maxWidth: "700px" }}>
+        <Typography
+          variant="h6"
+          sx={{
+            fontSize: { xs: "24px", sm: "30px" },
+            mb: 2,
+          }}
+        >
           Time Left: {timer} seconds
         </Typography>
-        <Typography variant="h4" sx={{ fontSize: "40px", mb: 3 }}>
+        <Typography
+          variant="h4"
+          sx={{
+            fontSize: { xs: "24px", sm: "32px" },
+            mb: 3,
+          }}
+        >
           {he.decode(currentQuestion.question)}
         </Typography>
 
@@ -279,18 +327,28 @@ const QuestionScreen: React.FC<QuestionScreenProps> = ({
           justifyContent="center"
           alignItems="center"
           sx={{
-            rowGap: "60px",
-            columnGap: "25px",
+            rowGap: { xs: "30px", sm: "40px" },
+            columnGap: { xs: "10px", sm: "20px" },
             maxWidth: "700px",
             margin: "0 auto",
           }}
         >
           {shuffledAnswers.map((answer, index) => (
-            <Grid item xs={6} key={index} maxWidth="47% !important">
+            <Grid
+              item
+              key={index}
+              xs={12}
+              sm={6}
+              md={6}
+              sx={{ display: "flex", justifyContent: "center" }}
+            >
               <OptionButton
                 onClick={() => setSelectedAnswer(answer)}
                 selected={selectedAnswer === answer}
                 ref={(el) => (answerRefs.current[index] = el)}
+                sx={{
+                  width: { xs: "fit-content", sm: "100%" },
+                }}
               >
                 {he.decode(answer)}
               </OptionButton>
@@ -303,7 +361,10 @@ const QuestionScreen: React.FC<QuestionScreenProps> = ({
           alignItems="center"
           justifyContent="center"
           gap={4}
-          sx={{ mt: 4 }}
+          sx={{
+            mt: { xs: 4, sm: 4 },
+            mb: { xs: "50px", sm: 4 }, // Set margin-bottom to 50px on small screens
+          }}
         >
           <ActionButton variant="contained" onClick={handleSkip}>
             Skip
@@ -318,22 +379,60 @@ const QuestionScreen: React.FC<QuestionScreenProps> = ({
         </Stack>
       </Box>
 
-      <InstructionBox>
-        <Box sx={{ display: "flex", alignItems: "center", ml: 2, gap: "10px" }}>
-          {questionType === "multiple" ? (
-            <>
-              {["1", "2", "3", "4"].map((key) => (
+      <InstructionBox
+        sx={{
+          position: "fixed",
+          bottom: {
+            xs: "10px",
+            sm: "20px",
+          },
+          left: {
+            xs: "10px",
+            sm: "20px",
+          },
+          flexDirection: { xs: "column", sm: "row" },
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: "5px",
+            flexDirection: { xs: "row", sm: "row" },
+            mb: { xs: 1, sm: 0 },
+          }}
+        >
+          {questionType === "multiple"
+            ? ["1", "2", "3", "4"].map((key) => (
+                <ShortcutKey key={key}>{key}</ShortcutKey>
+              ))
+            : ["T", "F"].map((key) => (
                 <ShortcutKey key={key}>{key}</ShortcutKey>
               ))}
-              <Typography variant="body1">Answer</Typography>
-            </>
-          ) : (
-            <>
-              <ShortcutKey>T</ShortcutKey>
-              <ShortcutKey>F</ShortcutKey>
-              <Typography variant="body1">Answer</Typography>
-            </>
-          )}
+          <Typography variant="body1">Answer</Typography>
+        </Box>
+
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: "5px",
+            flexDirection: { xs: "row", sm: "row" },
+            mb: { xs: 1, sm: 0 },
+          }}
+        >
+          <KeyboardIcon />
+          <Typography variant="body1">Answer</Typography>
+        </Box>
+
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: "5px",
+            flexDirection: { xs: "row", sm: "row" },
+          }}
+        >
           <ShortcutKey>S</ShortcutKey>
           <Typography variant="body1">kip</Typography>
           <ShortcutKey>N</ShortcutKey>
