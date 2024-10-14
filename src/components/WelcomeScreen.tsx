@@ -1,5 +1,12 @@
-import React, { useState } from "react";
-import { Box, TextField, Button, Container, Stack } from "@mui/material";
+import React, { useState, useEffect, useRef } from "react";
+import {
+  Box,
+  TextField,
+  Button,
+  Container,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { fetchToken } from "../api";
 import { GameState } from "../types";
 import { styled } from "@mui/material/styles";
@@ -47,6 +54,7 @@ const DifficultyButton = styled(Button)<{ selected: boolean }>(
     color: "#000",
     fontSize: "25px",
     boxSizing: "border-box",
+    textTransform: "none",
   })
 );
 
@@ -65,6 +73,25 @@ const PlayButton = styled(Button)(({ theme }) => ({
   "&:not(:disabled)": {
     color: "black",
   },
+  textTransform: "uppercase",
+}));
+
+const InstructionBox = styled(Box)(({ theme }) => ({
+  position: "absolute",
+  bottom: "20px",
+  left: "20px",
+  display: "flex",
+  alignItems: "center",
+  gap: "10px",
+  color: "#000",
+}));
+
+const ShortcutKey = styled(Box)(({ theme }) => ({
+  backgroundColor: "#B6B6B6",
+  padding: "2px 6px",
+  borderRadius: "4px",
+  fontWeight: "bold",
+  marginRight: "5px",
 }));
 
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ setGameState }) => {
@@ -72,6 +99,18 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ setGameState }) => {
   const [difficulty, setDifficulty] = useState("easy");
 
   const difficulties = ["easy", "medium", "hard"];
+
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const playButtonRef = useRef<HTMLButtonElement>(null);
+  const difficultyRefs = {
+    easy: useRef<HTMLButtonElement>(null),
+    medium: useRef<HTMLButtonElement>(null),
+    hard: useRef<HTMLButtonElement>(null),
+  };
+
+  useEffect(() => {
+    nameInputRef.current?.focus();
+  }, []);
 
   const startGame = async () => {
     const token = await fetchToken();
@@ -83,6 +122,37 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ setGameState }) => {
     }));
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (document.activeElement === nameInputRef.current) {
+      return;
+    }
+
+    if (e.key === "Enter") {
+      if (document.activeElement === difficultyRefs[difficulty]?.current) {
+        if (playerName) {
+          startGame();
+        }
+      } else if (document.activeElement === playButtonRef.current) {
+        if (playerName) {
+          startGame();
+        }
+      }
+    } else if (e.key.toLowerCase() === "e") {
+      setDifficulty("easy");
+      difficultyRefs["easy"].current?.focus();
+    } else if (e.key.toLowerCase() === "m") {
+      setDifficulty("medium");
+      difficultyRefs["medium"].current?.focus();
+    } else if (e.key.toLowerCase() === "h") {
+      setDifficulty("hard");
+      difficultyRefs["hard"].current?.focus();
+    } else if (e.key.toLowerCase() === "p") {
+      if (playerName) {
+        playButtonRef.current?.click();
+      }
+    }
+  };
+
   return (
     <Container
       maxWidth="sm"
@@ -91,7 +161,10 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ setGameState }) => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        position: "relative",
       }}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
     >
       <Stack sx={{ alignItems: "center" }}>
         <BackgroundBox>
@@ -101,6 +174,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ setGameState }) => {
             onChange={(e) => setPlayerName(e.target.value)}
             variant="outlined"
             InputProps={{ disableUnderline: true }}
+            inputRef={nameInputRef}
           />
           <Box
             sx={{
@@ -112,8 +186,9 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ setGameState }) => {
                 key={level}
                 onClick={() => setDifficulty(level)}
                 selected={difficulty === level}
+                ref={difficultyRefs[level]}
               >
-                {level.charAt(0) + level.slice(1)}
+                {level.charAt(0).toUpperCase() + level.slice(1)}
               </DifficultyButton>
             ))}
           </Box>
@@ -123,10 +198,30 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ setGameState }) => {
           variant="contained"
           onClick={startGame}
           disabled={!playerName}
+          ref={playButtonRef}
         >
           Play
         </PlayButton>
       </Stack>
+
+      <InstructionBox>
+        <Box sx={{ display: "flex", gap: "5px", ml: 2 }}>
+          {["E", "M", "H", "P"].map((key, index) => (
+            <Box key={index} sx={{ display: "flex", alignItems: "center" }}>
+              <ShortcutKey>{key}</ShortcutKey>
+              <Typography variant="body1">
+                {key === "E"
+                  ? "asy"
+                  : key === "M"
+                  ? "edium"
+                  : key === "H"
+                  ? "ard"
+                  : "lay"}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
+      </InstructionBox>
     </Container>
   );
 };

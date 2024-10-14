@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   Box,
@@ -43,6 +43,24 @@ const ActionButton = styled(Button)(({ theme }) => ({
   },
 }));
 
+const InstructionBox = styled(Box)(({ theme }) => ({
+  position: "absolute",
+  bottom: "20px",
+  left: "20px",
+  display: "flex",
+  alignItems: "center",
+  gap: "10px",
+  color: "#000",
+}));
+
+const ShortcutKey = styled(Box)(({ theme }) => ({
+  backgroundColor: "#B6B6B6",
+  padding: "2px 6px",
+  borderRadius: "4px",
+  fontWeight: "bold",
+  marginRight: "5px",
+}));
+
 const QuestionScreen: React.FC<QuestionScreenProps> = ({
   gameState,
   setGameState,
@@ -51,6 +69,9 @@ const QuestionScreen: React.FC<QuestionScreenProps> = ({
   const [selectedAnswer, setSelectedAnswer] = useState("");
   const [timer, setTimer] = useState(90);
   const [shuffledAnswers, setShuffledAnswers] = useState<string[]>([]);
+  const [questionType, setQuestionType] = useState<"multiple" | "boolean">(
+    "multiple"
+  );
   const N = 3; // Number of questions per category
   const M = 3; // Number of categories to complete
 
@@ -72,6 +93,8 @@ const QuestionScreen: React.FC<QuestionScreenProps> = ({
     queryFn: () => fetchQuestions(params),
   });
 
+  const answerRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
   useEffect(() => {
     setTimer(difficultyTimes[gameState.difficulty]);
     const countdown = setInterval(() => {
@@ -89,6 +112,7 @@ const QuestionScreen: React.FC<QuestionScreenProps> = ({
   useEffect(() => {
     if (questions && questions[currentQuestionIndex]) {
       const currentQuestion = questions[currentQuestionIndex];
+      setQuestionType(currentQuestion.type);
       if (currentQuestion.type === "multiple") {
         const answers = [
           currentQuestion.correct_answer,
@@ -102,6 +126,10 @@ const QuestionScreen: React.FC<QuestionScreenProps> = ({
       }
     }
   }, [currentQuestionIndex, questions]);
+
+  useEffect(() => {
+    answerRefs.current[0]?.focus();
+  }, [shuffledAnswers]);
 
   const handleSubmit = () => {
     if (!questions) return;
@@ -163,6 +191,31 @@ const QuestionScreen: React.FC<QuestionScreenProps> = ({
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (questionType === "multiple") {
+      if (["1", "2", "3", "4"].includes(e.key)) {
+        const index = parseInt(e.key) - 1;
+        if (shuffledAnswers[index]) {
+          setSelectedAnswer(shuffledAnswers[index]);
+        }
+      }
+    } else {
+      if (e.key.toLowerCase() === "t") {
+        setSelectedAnswer("True");
+      } else if (e.key.toLowerCase() === "f") {
+        setSelectedAnswer("False");
+      }
+    }
+
+    if (e.key.toLowerCase() === "n" || e.key === "Enter") {
+      if (selectedAnswer) {
+        handleSubmit();
+      }
+    } else if (e.key.toLowerCase() === "s") {
+      handleSkip();
+    }
+  };
+
   if (isLoading)
     return (
       <Container
@@ -207,7 +260,10 @@ const QuestionScreen: React.FC<QuestionScreenProps> = ({
         alignItems: "center",
         justifyContent: "center",
         height: "100vh",
+        position: "relative",
       }}
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
     >
       <Box sx={{ textAlign: "center" }}>
         <Typography variant="h6" sx={{ fontSize: "30px", mb: 2 }}>
@@ -234,6 +290,7 @@ const QuestionScreen: React.FC<QuestionScreenProps> = ({
               <OptionButton
                 onClick={() => setSelectedAnswer(answer)}
                 selected={selectedAnswer === answer}
+                ref={(el) => (answerRefs.current[index] = el)}
               >
                 {he.decode(answer)}
               </OptionButton>
@@ -260,6 +317,29 @@ const QuestionScreen: React.FC<QuestionScreenProps> = ({
           </ActionButton>
         </Stack>
       </Box>
+
+      <InstructionBox>
+        <Box sx={{ display: "flex", alignItems: "center", ml: 2, gap: "10px" }}>
+          {questionType === "multiple" ? (
+            <>
+              {["1", "2", "3", "4"].map((key) => (
+                <ShortcutKey key={key}>{key}</ShortcutKey>
+              ))}
+              <Typography variant="body1">Answer</Typography>
+            </>
+          ) : (
+            <>
+              <ShortcutKey>T</ShortcutKey>
+              <ShortcutKey>F</ShortcutKey>
+              <Typography variant="body1">Answer</Typography>
+            </>
+          )}
+          <ShortcutKey>S</ShortcutKey>
+          <Typography variant="body1">kip</Typography>
+          <ShortcutKey>N</ShortcutKey>
+          <Typography variant="body1">ext</Typography>
+        </Box>
+      </InstructionBox>
     </Container>
   );
 };
