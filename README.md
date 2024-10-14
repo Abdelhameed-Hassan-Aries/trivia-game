@@ -81,6 +81,7 @@ This will create an optimized production build in the `dist` folder.
   - Stacked bar chart displaying performance per category.
   - Line chart showing time taken per question.
 - **Responsive Design**: Optimized for both desktop and mobile devices.
+- **Keyboard Support**: Navigate the game using keyboard shortcuts for a better user experience.
 
 ---
 
