@@ -53,7 +53,7 @@ To start the application in development mode with hot reloading:
 npm run dev
 ```
 
-The app should now be running on [http://localhost:3000](http://localhost:3000).
+The app should now be running on [http://localhost:5173](http://localhost:5173).
 
 ### Production Build
 
@@ -93,9 +93,6 @@ This will create an optimized production build in the `dist` folder.
 - **Styling**: [Material-UI (MUI)](https://mui.com/) components and styling solutions.
 - **Charts**: [ApexCharts](https://apexcharts.com/) integrated via [react-apexcharts](https://github.com/apexcharts/react-apexcharts)
 - **Data Fetching and Caching**: [React Query](https://tanstack.com/query/latest)
-- **Routing**: [React Router](https://reactrouter.com/) (if applicable)
-- **Utilities**:
-  - [he](https://github.com/mathiasbynens/he): For decoding HTML entities in API responses.
 
 ---
 
