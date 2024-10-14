@@ -21,7 +21,7 @@ interface QuestionScreenProps {
 
 const OptionButton = styled(Button)<{ selected: boolean }>(({ selected }) => ({
   width: "100%",
-  height: "100px",
+  minHeight: "100px",
   backgroundColor: "#B6B6B6",
   color: "#000",
   fontSize: "20px",
@@ -29,6 +29,18 @@ const OptionButton = styled(Button)<{ selected: boolean }>(({ selected }) => ({
   textAlign: "center",
   whiteSpace: "normal",
   border: selected ? "2px solid #1976d2" : "1px solid black",
+}));
+
+const ActionButton = styled(Button)(({ theme }) => ({
+  width: "150px",
+  height: "50px",
+  backgroundColor: "#B6B6B6",
+  color: "#000",
+  fontSize: "20px",
+  textTransform: "none",
+  "&:hover": {
+    backgroundColor: "#B6B6B6",
+  },
 }));
 
 const QuestionScreen: React.FC<QuestionScreenProps> = ({
@@ -236,22 +248,16 @@ const QuestionScreen: React.FC<QuestionScreenProps> = ({
           gap={4}
           sx={{ mt: 4 }}
         >
-          <Button
-            variant="outlined"
-            onClick={handleSkip}
-            sx={{ width: "150px", height: "50px", fontSize: "20px" }}
-          >
+          <ActionButton variant="contained" onClick={handleSkip}>
             Skip
-          </Button>
-          <Button
+          </ActionButton>
+          <ActionButton
             variant="contained"
-            color="primary"
             onClick={handleSubmit}
             disabled={!selectedAnswer}
-            sx={{ width: "150px", height: "50px", fontSize: "20px" }}
           >
             Next
-          </Button>
+          </ActionButton>
         </Stack>
       </Box>
     </Container>
