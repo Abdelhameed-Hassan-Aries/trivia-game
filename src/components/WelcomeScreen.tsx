@@ -27,9 +27,16 @@ const BackgroundBox = styled(Box)(({ theme }) => ({
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
+  [theme.breakpoints.down("sm")]: {
+    maxWidth: "90vw",
+    width: "90vw",
+    maxHeight: "90%",
+    height: "auto",
+    padding: "10px",
+  },
 }));
 
-const PlayerNameInput = styled(TextField)({
+const PlayerNameInput = styled(TextField)(({ theme }) => ({
   width: "410px",
   height: "110px",
   borderRadius: "4px",
@@ -41,10 +48,18 @@ const PlayerNameInput = styled(TextField)({
     height: "100%",
     fontSize: "25px",
   },
-});
+  [theme.breakpoints.down("sm")]: {
+    width: "100%",
+    height: "auto",
+    fontSize: "1rem",
+    "& .MuiInputBase-root": {
+      fontSize: "1rem",
+    },
+  },
+}));
 
 const DifficultyButton = styled(Button)<{ selected: boolean }>(
-  ({ selected }) => ({
+  ({ selected, theme }) => ({
     width: "100px",
     height: "100px",
     borderRadius: "4px",
@@ -55,6 +70,11 @@ const DifficultyButton = styled(Button)<{ selected: boolean }>(
     fontSize: "25px",
     boxSizing: "border-box",
     textTransform: "none",
+    [theme.breakpoints.down("sm")]: {
+      width: "80px",
+      height: "80px",
+      fontSize: "1rem",
+    },
   })
 );
 
@@ -74,6 +94,12 @@ const PlayButton = styled(Button)(({ theme }) => ({
     color: "black",
   },
   textTransform: "uppercase",
+  [theme.breakpoints.down("sm")]: {
+    width: "160px",
+    height: "40px",
+    fontSize: "1rem",
+    marginTop: "20px",
+  },
 }));
 
 const InstructionBox = styled(Box)(({ theme }) => ({
@@ -84,6 +110,11 @@ const InstructionBox = styled(Box)(({ theme }) => ({
   alignItems: "center",
   gap: "10px",
   color: "#000",
+  [theme.breakpoints.down("sm")]: {
+    bottom: "10px",
+    left: "10px",
+    fontSize: "0.8rem",
+  },
 }));
 
 const ShortcutKey = styled(Box)(({ theme }) => ({
@@ -92,6 +123,10 @@ const ShortcutKey = styled(Box)(({ theme }) => ({
   borderRadius: "4px",
   fontWeight: "bold",
   marginRight: "5px",
+  [theme.breakpoints.down("sm")]: {
+    padding: "1px 4px",
+    fontSize: "0.8rem",
+  },
 }));
 
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ setGameState }) => {
