@@ -1,13 +1,5 @@
-// src/components/WelcomeScreen.tsx
 import React, { useState } from "react";
-import {
-  Box,
-  TextField,
-  Button,
-  Typography,
-  Container,
-  Stack,
-} from "@mui/material";
+import { Box, TextField, Button, Container, Stack } from "@mui/material";
 import { fetchToken } from "../api";
 import { GameState } from "../types";
 import { styled } from "@mui/material/styles";
@@ -66,12 +58,12 @@ const PlayButton = styled(Button)(({ theme }) => ({
   marginTop: "46px",
   fontSize: "25px",
   backgroundColor: "#B6B6B6",
-  color: "rgba(0, 0, 0, 0.38)", // Default disabled text color
+  color: "rgba(0, 0, 0, 0.38)",
   "&:disabled": {
-    color: "rgba(0, 0, 0, 0.38)", // Disabled text color
+    color: "rgba(0, 0, 0, 0.38)",
   },
   "&:not(:disabled)": {
-    color: "black", // Enabled text color
+    color: "black",
   },
 }));
 

@@ -103,6 +103,7 @@ const QuestionScreen: React.FC<QuestionScreenProps> = ({
         ...prev.answers,
         {
           question: currentQuestion.question,
+          category: currentQuestion.category,
           correct: isCorrect,
           skipped: false,
           timeTaken: difficultyTimes[gameState.difficulty] - timer,
@@ -122,6 +123,7 @@ const QuestionScreen: React.FC<QuestionScreenProps> = ({
         ...prev.answers,
         {
           question: currentQuestion.question,
+          category: currentQuestion.category,
           correct: false,
           skipped: true,
           timeTaken: difficultyTimes[gameState.difficulty] - timer,

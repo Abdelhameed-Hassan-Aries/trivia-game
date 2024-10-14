@@ -1,4 +1,3 @@
-// src/components/CategorySelection.tsx
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchCategories } from "../api";
@@ -18,7 +17,6 @@ interface CategorySelectionProps {
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
 }
 
-// Styled Components
 const CategoryButton = styled(Button)<{ selected: boolean }>(
   ({ selected }) => ({
     width: "100%",
@@ -85,7 +83,6 @@ const CategorySelection: React.FC<CategorySelectionProps> = ({
         return;
       }
 
-      // Pick a random category from available categories
       const randomCategory =
         availableCategories[
           Math.floor(Math.random() * availableCategories.length)

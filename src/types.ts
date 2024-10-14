@@ -1,3 +1,5 @@
+// src/types.ts
+
 export interface GameState {
   playerName: string;
   difficulty: string;
@@ -12,6 +14,7 @@ export interface GameState {
 
 export interface Answer {
   question: string;
+  category: string;
   correct: boolean;
   skipped: boolean;
   timeTaken: number;
