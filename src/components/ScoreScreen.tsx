@@ -10,7 +10,6 @@ interface ScoreScreenProps {
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
 }
 
-// Styled Components
 const NewGameButton = styled(Button)(({ theme }) => ({
   width: "330px",
   height: "100px",

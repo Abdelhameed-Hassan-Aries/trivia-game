@@ -1,5 +1,3 @@
-// src/types.ts
-
 export interface GameState {
   playerName: string;
   difficulty: string;
