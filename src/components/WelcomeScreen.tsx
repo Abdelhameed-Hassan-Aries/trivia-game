@@ -19,12 +19,15 @@ interface WelcomeScreenProps {
 const BackgroundBox = styled(Box)(({ theme }) => ({
   background: "#D9D9D9",
   maxWidth: "616px",
+  width: "616px",
   maxHeight: "448px",
+  height: "448px",
   borderRadius: "22px",
-  padding: "100px",
+  padding: "20px",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
+  justifyContent: "center",
 }));
 
 const PlayerNameInput = styled(TextField)({
@@ -64,9 +67,6 @@ const PlayButton = styled(Button)(({ theme }) => ({
   fontSize: "25px",
   backgroundColor: "#B6B6B6",
   color: "rgba(0, 0, 0, 0.38)", // Default disabled text color
-  "&:hover": {
-    backgroundColor: "transparent",
-  },
   "&:disabled": {
     color: "rgba(0, 0, 0, 0.38)", // Disabled text color
   },
@@ -96,7 +96,6 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ setGameState }) => {
       maxWidth="sm"
       sx={{
         height: "100vh",
-        mt: 5,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",

@@ -1,4 +1,3 @@
-// src/components/QuestionScreen.tsx
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -61,7 +60,6 @@ const QuestionScreen: React.FC<QuestionScreenProps> = ({
       });
     }, 1000);
     return () => clearInterval(countdown);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentQuestionIndex]);
 
   const handleSubmit = () => {

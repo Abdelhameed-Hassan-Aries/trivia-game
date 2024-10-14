@@ -1,21 +1,58 @@
 // src/components/CategorySelection.tsx
-import React from "react";
+import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchCategories } from "../api";
 import {
   Box,
   Button,
-  Grid,
   Typography,
   Container,
   CircularProgress,
+  Grid,
 } from "@mui/material";
 import { GameState, Category } from "../types";
+import { styled } from "@mui/material/styles";
 
 interface CategorySelectionProps {
   gameState: GameState;
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
 }
+
+// Styled Components
+const CategoryButton = styled(Button)<{ selected: boolean }>(
+  ({ selected }) => ({
+    width: "100%",
+    height: "100px",
+    backgroundColor: "#B6B6B6",
+    color: "#000",
+    border: selected ? "2px solid #1976d2" : "1px solid black",
+    textTransform: "none",
+    fontSize: "20px",
+    textWrap: "balance",
+    "&:disabled": {
+      opacity: 0.5,
+    },
+  })
+);
+
+const StartButton = styled(Button)(({ theme }) => ({
+  width: "192px",
+  height: "46px",
+  borderRadius: "4px",
+  border: "1px solid black",
+  marginTop: "60px",
+  marginBottom: "60px",
+  fontSize: "25px",
+  backgroundColor: "#B6B6B6",
+  color: "#000",
+  textTransform: "uppercase",
+  "&:hover": {
+    backgroundColor: "#B6B6B6",
+  },
+  "&:disabled": {
+    opacity: 0.5,
+  },
+}));
 
 const CategorySelection: React.FC<CategorySelectionProps> = ({
   gameState,
@@ -26,7 +63,37 @@ const CategorySelection: React.FC<CategorySelectionProps> = ({
     queryFn: fetchCategories,
   });
 
-  const selectCategory = (categoryId: number | null) => {
+  const [selectedCategory, setSelectedCategory] = useState<
+    number | "random" | null
+  >(null);
+
+  const handleSelectCategory = (categoryId: number | "random") => {
+    setSelectedCategory(categoryId);
+  };
+
+  const startGame = () => {
+    let categoryId: number | null = selectedCategory as number;
+
+    if (selectedCategory === "random" && categories) {
+      // Filter out categories that have already been selected
+      const availableCategories = categories.filter(
+        (category) => !gameState.selectedCategories.includes(category.id)
+      );
+
+      if (availableCategories.length === 0) {
+        alert("No more categories available.");
+        return;
+      }
+
+      // Pick a random category from available categories
+      const randomCategory =
+        availableCategories[
+          Math.floor(Math.random() * availableCategories.length)
+        ];
+
+      categoryId = randomCategory.id;
+    }
+
     setGameState((prev) => ({
       ...prev,
       currentCategory: categoryId,
@@ -42,34 +109,48 @@ const CategorySelection: React.FC<CategorySelectionProps> = ({
     );
 
   return (
-    <Container maxWidth="md" sx={{ mt: 5 }}>
-      <Typography variant="h5" gutterBottom>
-        Select a Category
+    <Container
+      sx={{
+        minWidth: "100%",
+        width: "100%",
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        pt: 5,
+        color: "#000",
+        margin: "16px",
+      }}
+    >
+      <Typography variant="h2" gutterBottom sx={{ marginBottom: "60px" }}>
+        Questions Category
       </Typography>
-      <Grid container spacing={2}>
-        {categories?.map((category) => (
-          <Grid item xs={6} md={4} key={category.id}>
-            <Button
-              variant="outlined"
-              fullWidth
-              onClick={() => selectCategory(category.id)}
-              disabled={gameState.selectedCategories.includes(category.id)}
+      <Box sx={{ width: "100%", maxWidth: 1000 }}>
+        <Grid container spacing={5} justifyContent="center">
+          {categories?.map((category) => (
+            <Grid item xs={12} sm={4} md={4} key={category.id}>
+              <CategoryButton
+                onClick={() => handleSelectCategory(category.id)}
+                disabled={gameState.selectedCategories.includes(category.id)}
+                selected={selectedCategory === category.id}
+              >
+                {category.name}
+              </CategoryButton>
+            </Grid>
+          ))}
+          <Grid item xs={12}>
+            <CategoryButton
+              onClick={() => handleSelectCategory("random")}
+              selected={selectedCategory === "random"}
             >
-              {category.name}
-            </Button>
+              Random Category
+            </CategoryButton>
           </Grid>
-        ))}
-        <Grid item xs={12}>
-          <Button
-            variant="contained"
-            color="secondary"
-            fullWidth
-            onClick={() => selectCategory(null)}
-          >
-            Random Category
-          </Button>
         </Grid>
-      </Grid>
+      </Box>
+      <StartButton onClick={startGame} disabled={selectedCategory === null}>
+        START
+      </StartButton>
     </Container>
   );
 };
